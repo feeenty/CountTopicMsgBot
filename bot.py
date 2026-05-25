@@ -50,7 +50,7 @@ async def top(msg: types.Message):
 
     text = "Топ пользователей в чате\n"
     for i, (user_id, username, count) in enumerate(top, 1):
-        text += f"{username} - {count}\n"
+        text += f"{i}. {username} - {count}\n"
 
     await msg.reply(text)
 
