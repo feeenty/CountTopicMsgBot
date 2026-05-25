@@ -27,6 +27,7 @@ connection.commit()
 @dp.message(Command("topic_id"))
 async def topic_id(msg: types.Message):
     topic_id = msg.message_thread_id
+    print(topic_id)
     await msg.reply(f"ID темы: {topic_id}")
 
 
