@@ -14,9 +14,10 @@ dp = Dispatcher()
 
 connection = sqlite3.connect('user_messages.db')
 cursor = connection.cursor()
-cursor.execute("""
+cursor.execute(
+"""
 CREATE TABLE IF NOT EXISTS user_messages (
-    user_id INT,
+    user_id INT PRIMARY KEY,
     username TEXT,
     message_count INT
 )
@@ -31,9 +32,50 @@ async def topic_id(msg: types.Message):
     await msg.reply(f"ID темы: {topic_id}")
 
 
+@dp.message(Command("top"))
+async def top(msg: types.Message):
+    connection = sqlite3.connect('user_messages.db')
+    cursor = connection.cursor()
+
+    top = cursor.execute(
+        """
+        SELECT user_id, username, message_count
+        FROM user_messages
+        ORDER BY message_count DESC
+        """
+    ).fetchall()
+
+    if not top:
+        await msg.reply("Нет ни одного сообщения")
+
+    text = "Топ пользователей в чате\n"
+    for i, (user_id, username, count) in enumerate(top, 1):
+        text += f"{username} - {count}"
+
+    connection.commit()
+
+
 @dp.message()
 async def handler(msg: types.Message):
-    pass
+    if msg.message_thread_id:
+        return
+
+    connection = sqlite3.connect('user_messages.db')
+    cursor = connection.cursor()
+
+    user = msg.from_user
+    cursor.execute(
+        """
+        INSERT INTO user_messages (user_id, username, message_count)
+        VALUES (?, ?, 1)
+        ON CONFLICT (user_id) DO UPDATE SET
+        username = EXCLUDED.username,
+        message_count = message_count + 1
+        """,
+        (user.id, user.username or user.first_name)
+    )
+
+    connection.commit()
 
 
 async def main():
