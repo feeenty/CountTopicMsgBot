@@ -50,7 +50,9 @@ async def top(msg: types.Message):
 
     text = "Топ пользователей в чате\n"
     for i, (user_id, username, count) in enumerate(top, 1):
-        text += f"{username} - {count}"
+        text += f"{username} - {count}\n"
+
+    await msg.reply(text)
 
     connection.commit()
 
