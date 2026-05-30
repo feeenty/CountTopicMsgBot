@@ -12,7 +12,8 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-connection = sqlite3.connect('user_messages.db')
+db_path = "/app/shared/tmp4qwt3309.db"
+connection = sqlite3.connect(db_path)
 cursor = connection.cursor()
 cursor.execute(
 """
@@ -47,6 +48,7 @@ async def top(msg: types.Message):
 
     if not top:
         await msg.reply("Нет ни одного сообщения")
+        return
 
     text = "Топ пользователей в чате\n"
     for i, (user_id, username, count) in enumerate(top, 1):
